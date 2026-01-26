@@ -7,7 +7,8 @@ from typing import TypedDict,Annotated,List,Optional
 from langchain_core.output_parsers import PydanticOutputParser
 
 hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-llm=HuggingFaceEndpoint(repo_id="Qwen/Qwen2.5-32B-Instruct",huggingfacehub_api_token=hf_token)
+llm=HuggingFaceEndpoint(repo_id="Qwen/Qwen2.5-32B-Instruct",huggingfacehub_api_token=hf_token,max_tokens=1200)
+)
 model=ChatHuggingFace(llm=llm)
 
 class Section(BaseModel):
@@ -71,7 +72,7 @@ Guidelines:
 - Return the output as a clean numbered list only, with no extra text
 Project Input:
 {project_input}
-\n IMPORTANT NOTE->you must have to follow the given schema stictly \n {format_instruction}
+\n MOST IMPORTANT NOTE->you must have to follow the given schema stictly \n {format_instruction}
 
 """,input_variables=["tone","project_input"],partial_variables={"format_instruction":parser_decode.get_format_instructions()}
     )    
@@ -129,7 +130,8 @@ Recommended sections (you may add more if relevant):
 PROJECT TOPIC
 ========================
 {topic}
-
+\n
+MOST IMPORTANT NOTE->
 Now generate the documentation strictly according to the schema only .
 \n {format_instruction}
         
@@ -197,7 +199,7 @@ If context is minimal, you may introduce standard sections such as:
 PROJECT CONTEXT
 ========================
 {context}
-
+\n MOST IMPORTANT NOTE->
 Now generate the documentation strictly according to the schema strictly.
 
 \n {format_instruction} """,input_variables=["context","tone","final_heading"],partial_variables={"format_instruction":parser.get_format_instructions()}
