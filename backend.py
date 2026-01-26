@@ -2,6 +2,7 @@ from langchain_huggingface import HuggingFaceEndpoint,ChatHuggingFace
 from langgraph.graph import StateGraph,START,END
 from langchain_core.prompts import PromptTemplate
 from pydantic import Field,BaseModel
+import os
 from typing import TypedDict,Annotated,List,Optional
 from langchain_core.output_parsers import PydanticOutputParser
 
