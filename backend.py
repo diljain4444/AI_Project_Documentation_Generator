@@ -105,7 +105,7 @@ based ONLY on the given project topic.always keep in mind to provide BIG and REL
 - Every section must be meaningful and detailed
 
 - Generate detailed, in-depth explanations for every section.
-- For each section, include multiple bullet points (at least 5–8) with examples, reasoning, or technical details.
+- For each section, include multiple bullet points (at least 6–8) with examples, reasoning, or technical details.
 - Add relevant subpoints if needed to clarify complex concepts.
 - Assume the reader is a developer or stakeholder; provide professional and practical information.
 - If the context or topic is small, expand it with general relevant knowledge and common practices in the field.
@@ -174,7 +174,7 @@ When adding information:
 - Do NOT wrap the output in ``` or any formatting
 
 - Generate detailed, in-depth explanations for every section.
-- For each section, include multiple bullet points (at least 5–8) with examples, reasoning, or technical details.
+- For each section, include multiple bullet points (at least 6–8) with examples, reasoning, or technical details.
 - Add relevant subpoints if needed to clarify complex concepts.
 - Assume the reader is a developer or stakeholder; provide professional and practical information.
 - If the context or topic is small, expand it with general relevant knowledge and common practices in the field.
