@@ -5,8 +5,7 @@ from pydantic import Field,BaseModel
 from typing import TypedDict,Annotated,List,Optional
 from langchain_core.output_parsers import PydanticOutputParser
 
-from dotenv import load_dotenv
-load_dotenv()
+hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 llm=HuggingFaceEndpoint(repo_id="Qwen/Qwen2.5-32B-Instruct")
 model=ChatHuggingFace(llm=llm)
 
