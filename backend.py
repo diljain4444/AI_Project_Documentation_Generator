@@ -7,7 +7,7 @@ from typing import TypedDict,Annotated,List,Optional
 from langchain_core.output_parsers import PydanticOutputParser
 
 hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-llm=HuggingFaceEndpoint(repo_id="Qwen/Qwen2.5-7B-Instruct",api_key=hf_token,max_new_tokens=512)
+llm=HuggingFaceEndpoint(repo_id="Qwen/Qwen2.5-7B-Instruct",huggingfacehub_api_token=hf_token)
 model=ChatHuggingFace(llm=llm)
 
 class Section(BaseModel):
