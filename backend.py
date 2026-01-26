@@ -65,7 +65,7 @@ Guidelines:
 - Headings must be professional, meaningful, and specific to the project
 - Prefer clarity over verbosity in section titles
 - Avoid redundant or overlapping sections
-- Decide the number of sections dynamically (typically 8-15 depending on complexity)
+- Decide the number of sections dynamically ( atleast typically 8-15 depending on complexity)
 - Generate ONLY top-level section headings
 - Do NOT generate content, explanations, summaries, or subheadings
 - Return the output as a clean numbered list only, with no extra text
@@ -105,7 +105,7 @@ based ONLY on the given project topic.always keep in mind to provide BIG and REL
 - Every section must be meaningful and detailed
 
 - Generate detailed, in-depth explanations for every section.
-- For each section, include multiple bullet points (at least 6–8) with examples, reasoning, or technical details.
+- For each section, include multiple bullet points (at least 7–9) with examples, reasoning, or technical details.
 - Add relevant subpoints if needed to clarify complex concepts.
 - Assume the reader is a developer or stakeholder; provide professional and practical information.
 - If the context or topic is small, expand it with general relevant knowledge and common practices in the field.
@@ -115,7 +115,7 @@ based ONLY on the given project topic.always keep in mind to provide BIG and REL
 CONTENT GUIDELINES
 ========================
 - Title should be clear and professional
-- Create MULTIPLE sections (minimum 8–10 or according to user)
+- Create MULTIPLE sections (minimum atleast 8–10 or according to user)
 - Each section must have:
   - A clear heading
   - Multiple bullet-style content points (as list of strings)
@@ -174,7 +174,7 @@ When adding information:
 - Do NOT wrap the output in ``` or any formatting
 
 - Generate detailed, in-depth explanations for every section.
-- For each section, include multiple bullet points (at least 6–8) with examples, reasoning, or technical details.
+- For each section, include multiple bullet points (at least 7–9) with examples, reasoning, or technical details.
 - Add relevant subpoints if needed to clarify complex concepts.
 - Assume the reader is a developer or stakeholder; provide professional and practical information.
 - If the context or topic is small, expand it with general relevant knowledge and common practices in the field.
