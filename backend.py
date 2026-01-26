@@ -7,7 +7,7 @@ from typing import TypedDict,Annotated,List,Optional
 from langchain_core.output_parsers import PydanticOutputParser
 
 hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-llm=HuggingFaceEndpoint(repo_id="Qwen/Qwen2.5-32B-Instruct",huggingfacehub_api_token=hf_token,max_tokens=1200)
+llm=HuggingFaceEndpoint(repo_id="Qwen/Qwen2.5-32B-Instruct",huggingfacehub_api_token=hf_token)
 
 model=ChatHuggingFace(llm=llm)
 
@@ -17,7 +17,7 @@ class Section(BaseModel):
 
 class doc_schema(BaseModel):
     title:str=Field(description="the title of the documentation")
-    section:List[Section]="this will contain the list of all the sections"
+    section: List[Section] = Field(description="List of documentation sections")
 class state(TypedDict):
     topic:Optional[str]
     context:Optional[str]
@@ -40,10 +40,10 @@ def decoder_node(state):
     tone=state["tone"]
     prompt=PromptTemplate(
         template="""
-        You are a senior technical architect and professional documentation specialist.
+You are a senior technical architect and professional documentation specialist.
 
 Your task is to analyze the provided project input and design the most appropriate
-documentation structure for it.
+top-level documentation structure for it.
 
 The project input may be:
 - a short project topic, OR
@@ -58,23 +58,28 @@ based on:
 
 The tone of the documentation must strictly follow this user-defined tone:
 {tone}
-(Examples: Formal, Semi-Formal, Technical, Academic, Business-Oriented)
 
 Guidelines:
-- DO NOT use predefined or hardcoded documentation templates
-- DO NOT reuse generic headings unless they are genuinely relevant
+- Do NOT use predefined or hardcoded documentation templates
+- Do NOT reuse generic headings unless they are genuinely relevant
 - Headings must be professional, meaningful, and specific to the project
-- Prefer clarity over verbosity in section titles
 - Avoid redundant or overlapping sections
-- Decide the number of sections dynamically ( atleast typically 8-15 depending on complexity)
+- Decide the number of sections dynamically (typically 8–15 depending on complexity)
 - Generate ONLY top-level section headings
-- Do NOT generate content, explanations, summaries, or subheadings
-- Return the output as a clean numbered list only, with no extra text
+- Do NOT generate explanations, descriptions, or subheadings
+
+CRITICAL OUTPUT RULES:
+- The response MUST strictly follow the provided output schema
+- Return ONLY valid JSON
+- Do NOT include markdown, numbering, or extra text
+- Do NOT include anything outside the JSON object
+
 Project Input:
 {project_input}
-\n MOST IMPORTANT NOTE->you must have to follow the given schema stictly \n {format_instruction}
-
-""",input_variables=["tone","project_input"],partial_variables={"format_instruction":parser_decode.get_format_instructions()}
+\n
+{format_instruction}
+"""
+,input_variables=["tone","project_input"],partial_variables={"format_instruction":parser_decode.get_format_instructions()}
     )    
     chain=prompt|model|parser_decode
     response=chain.invoke({"project_input":content,"tone":tone})
@@ -88,53 +93,68 @@ parser=PydanticOutputParser(pydantic_object=doc_schema)
 
 def topic_based(state):
     heading=state["all_headings"]
-    final_heading=[f"-{head} \n "for head in heading]
+    final_heading = "\n".join(heading)
     topic=state["topic"]
     tone=state["tone"]
     prompt=PromptTemplate(
-        template="""
-You are an expert technical documentation writer.
+        template="""You are an expert technical documentation writer.
 
-Your task is to generate a COMPLETE, PROFESSIONAL project documentation in given TONE->{tone}
-based ONLY on the given project topic.always keep in mind to provide BIG and RELEVANT output
+Your task is to generate COMPLETE, PROFESSIONAL project documentation
+in the following tone: {tone}
 
-⚠️ VERY IMPORTANT OUTPUT RULES:
-- You MUST return the output in STRICT JSON format
-- The JSON MUST match the schema exactly
-- Do NOT add explanations, comments, markdown, or extra text
-- Do NOT wrap the output in ``` or any formatting
-- Every section must be meaningful and detailed
+The documentation must be detailed, comprehensive, and suitable for
+developers and technical stakeholders.
 
-- Generate detailed, in-depth explanations for every section.
-- For each section, include multiple bullet points (at least 4–6) with examples, reasoning, or technical details.
-- Add relevant subpoints if needed to clarify complex concepts.
-- Assume the reader is a developer or stakeholder; provide professional and practical information.
-- If the context or topic is small, expand it with general relevant knowledge and common practices in the field.
+========================
+STRICT OUTPUT CONSTRAINTS (CRITICAL)
+========================
+- You MUST return ONLY valid JSON
+- The JSON MUST strictly follow the provided schema
+- Do NOT add extra keys, nesting, or structural changes
+- Do NOT include markdown, comments, explanations, or formatting
+- Do NOT include text outside the JSON object
+- Every value must match the expected data type exactly
 
+========================
+STRUCTURE RULES (VERY IMPORTANT)
+========================
+- The title MUST be a single string
+- Each section MUST contain:
+  - "heading": a single string
+  - "content": a list of strings ONLY
+- Each content item must be a full, meaningful bullet-style explanation
+- Do NOT create sub-sections, nested objects, or numbered keys
+- Do NOT embed headings inside content strings
 
 ========================
 CONTENT GUIDELINES
 ========================
-- Title should be clear and professional
-- Create MULTIPLE sections (minimum atleast 8–10 or according to user)
-- Each section must have:
-  - A clear heading
-  - Multiple bullet-style content points (as list of strings)
-- Use simple, professional, and technical language
-- Assume the documentation is for developers and stakeholders
+- Generate multiple sections (minimum 8–10 or as appropriate)
+- Each section must be relevant and non-redundant
+- Each section must contain at least 4–6 detailed content points
+- Expand concepts using best practices and general industry knowledge
+- Keep language professional, technical, and practical
+- If the topic is small, intelligently expand using common patterns
 
-Recommended sections (you may add more if relevant):
-{final_heading} \n
+Use the following section headings as guidance.
+You may include all of them and may add more if relevant,
+but the structure must remain unchanged:
+
+{final_heading}
 
 ========================
 PROJECT TOPIC
 ========================
 {topic}
-\n
-MOST IMPORTANT NOTE->
-Now generate the documentation strictly according to the schema only .
-\n {format_instruction}
-        
+
+========================
+FINAL INSTRUCTION
+========================
+Generate the documentation strictly according to the schema below.
+Any deviation from the schema will result in failure.
+
+{format_instruction}
+
 """,input_variables=["topic","tone","final_heading"],partial_variables={
     "format_instruction":parser.get_format_instructions()
 } )
@@ -148,61 +168,71 @@ def context_based(state):
     context=state["context"]
     tone=state["tone"]
     heading=state["all_headings"]
-    final_heading=[f"-{head} \n "for head in heading]
+    final_heading = "\n".join(heading)
+    
     prompt=PromptTemplate(
 
         template="""
     You are an expert technical documentation architect.
 
-Your task is to CONVERT the given project context into a clean,
-well-structured, and professional project documentation in given TONE->{tone}.always keep in mind to provide BIG and RELEVANT output
+Your task is to convert the given project context into a clean,
+well-structured, and professional project documentation
+using the following tone: {tone}
 
-The input context may be unstructured, informal, incomplete, or very brief.
+The input context may be unstructured, informal, incomplete, or brief.
 
-If the provided context is:
-- Detailed → strictly organize and rewrite it
-- Brief or insufficient → intelligently EXPAND it with reasonable,
-  industry-standard assumptions that align with the topic
-
-When adding information:
-- Keep it realistic and commonly accepted
-- Do NOT introduce advanced or speculative features
-- Ensure all added information fits naturally into the documentation
-
-⚠️ VERY IMPORTANT OUTPUT RULES:
-- You MUST return the output in STRICT JSON format
-- The JSON MUST match the schema exactly
-- Do NOT add explanations, comments, markdown, or extra text
-- Do NOT wrap the output in ``` or any formatting
-
-- Generate detailed, in-depth explanations for every section.
-- For each section, include multiple bullet points (at least 4–6) with examples, reasoning, or technical details.
-- Add relevant subpoints if needed to clarify complex concepts.
-- Assume the reader is a developer or stakeholder; provide professional and practical information.
-- If the context or topic is small, expand it with general relevant knowledge and common practices in the field.
-
-
+If the context is:
+- Detailed → reorganize and professionally rewrite it
+- Brief or insufficient → expand it using realistic,
+  industry-standard assumptions relevant to the topic
 
 ========================
-STRUCTURING GUIDELINES
+STRICT OUTPUT CONSTRAINTS (CRITICAL)
 ========================
-- Derive the title from the context
-- Group related ideas into logical sections
-- Each section must include multiple concise bullet-style points
-- Rewrite content in a professional, technical tone
+- You MUST return ONLY valid JSON
+- The JSON MUST strictly follow the provided schema
+- Do NOT add extra keys, nesting, or structural changes
+- Do NOT include markdown, comments, or explanations
+- Do NOT include text outside the JSON object
+
+========================
+STRUCTURE RULES (NON-NEGOTIABLE)
+========================
+- The title MUST be a single string
+- Each section MUST contain ONLY:
+  - "heading": string
+  - "content": list of strings
+- Each content item must be a complete, self-contained explanation
+- Do NOT create sub-sections, nested objects, or grouped bullets
+- Do NOT embed headings inside content strings
+- Do NOT mirror the structure of the input context
+
+========================
+CONTENT GUIDELINES
+========================
+- Generate multiple logical sections (minimum 8–10 or as appropriate)
+- Each section must contain at least 4–6 detailed bullet-style points
+- Rewrite all content in a professional, technical tone
+- Expand minimally provided context using common industry practices
 - Avoid redundancy across sections
+- Do NOT introduce speculative or advanced features
 
-If context is minimal, you may introduce standard sections such as:
-{final_heading}\n
+If the provided context is minimal, you may include standard sections such as:
+{final_heading}
 
 ========================
 PROJECT CONTEXT
 ========================
 {context}
-\n MOST IMPORTANT NOTE->
-Now generate the documentation strictly according to the schema strictly.
 
-\n {format_instruction} """,input_variables=["context","tone","final_heading"],partial_variables={"format_instruction":parser.get_format_instructions()}
+========================
+FINAL INSTRUCTION
+========================
+Generate the documentation strictly according to the schema below.
+Structural creativity is NOT allowed. Content expansion IS allowed.
+
+{format_instruction}
+ """,input_variables=["context","tone","final_heading"],partial_variables={"format_instruction":parser.get_format_instructions()}
 )
     chain=prompt|model|parser
     response=chain.invoke({"context":context,"tone":tone,"final_heading":final_heading})
