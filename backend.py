@@ -8,7 +8,7 @@ from langchain_core.output_parsers import PydanticOutputParser
 
 hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 llm=HuggingFaceEndpoint(repo_id="Qwen/Qwen2.5-32B-Instruct",huggingfacehub_api_token=hf_token,max_tokens=1200)
-)
+
 model=ChatHuggingFace(llm=llm)
 
 class Section(BaseModel):
