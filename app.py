@@ -619,7 +619,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown(
     '<div style="text-align: center; color: #c4b5fd; font-size: 1rem; font-weight: 500; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);">'
-    '✨ Created by AI • Made with ❤️ using Streamlit ✨'
+    '✨ Created by DIL JAIN • Made with ❤️ using Streamlit ✨'
     '</div>',
     unsafe_allow_html=True
 )
