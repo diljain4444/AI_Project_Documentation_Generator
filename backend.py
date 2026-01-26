@@ -7,7 +7,7 @@ from typing import TypedDict,Annotated,List,Optional
 from langchain_core.output_parsers import PydanticOutputParser
 
 hf_token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
-llm=HuggingFaceEndpoint(repo_id="MasterControlAIML/DeepSeek-R1-Qwen2.5-1.5b-SFT-R1-JSON-Unstructured-To-Structured",huggingfacehub_api_token=hf_token)
+llm=HuggingFaceEndpoint(repo_id="Qwen/Qwen2.5-7B-Instruct",huggingfacehub_api_token=hf_token)
 model=ChatHuggingFace(llm=llm)
 
 class Section(BaseModel):
@@ -105,7 +105,7 @@ based ONLY on the given project topic.always keep in mind to provide BIG and REL
 - Every section must be meaningful and detailed
 
 - Generate detailed, in-depth explanations for every section.
-- For each section, include multiple bullet points (at least 7–9) with examples, reasoning, or technical details.
+- For each section, include multiple bullet points (at least 4–6) with examples, reasoning, or technical details.
 - Add relevant subpoints if needed to clarify complex concepts.
 - Assume the reader is a developer or stakeholder; provide professional and practical information.
 - If the context or topic is small, expand it with general relevant knowledge and common practices in the field.
@@ -174,7 +174,7 @@ When adding information:
 - Do NOT wrap the output in ``` or any formatting
 
 - Generate detailed, in-depth explanations for every section.
-- For each section, include multiple bullet points (at least 7–9) with examples, reasoning, or technical details.
+- For each section, include multiple bullet points (at least 4–6) with examples, reasoning, or technical details.
 - Add relevant subpoints if needed to clarify complex concepts.
 - Assume the reader is a developer or stakeholder; provide professional and practical information.
 - If the context or topic is small, expand it with general relevant knowledge and common practices in the field.
@@ -198,7 +198,7 @@ PROJECT CONTEXT
 ========================
 {context}
 
-Now generate the documentation strictly according to the schema stictly.
+Now generate the documentation strictly according to the schema strictly.
 
 \n {format_instruction} """,input_variables=["context","tone","final_heading"],partial_variables={"format_instruction":parser.get_format_instructions()}
 )
