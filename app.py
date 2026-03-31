@@ -414,7 +414,7 @@ st.markdown("""
 # -----------------------------
 # Header
 # -----------------------------
-st.markdown("<h1>AI Project Documentation Generator</h1>", unsafe_allow_html=True)
+st.markdown("<h1>AI Project Documentation Generator...</h1>", unsafe_allow_html=True)
 st.markdown(
     '<div class="subtitle">Generate professional project documentation instantly<br>'
     'using AI. Just provide a topic or context.</div>',
